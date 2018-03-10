@@ -1,8 +1,6 @@
 {
     "require": {
-        "brick/math": "^0.7.1"
     },
     "autoload": {
-        
     }
 }
