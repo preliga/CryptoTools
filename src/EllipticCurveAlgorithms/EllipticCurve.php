@@ -8,7 +8,7 @@
 
 namespace EllipticCurveAlgorithms;
 
-use Components\BigInteger;
+use Components\Element;
 use Components\Field;
 
 class EllipticCurve
@@ -19,12 +19,12 @@ class EllipticCurve
     protected $field;
 
     /**
-     * @var BigInteger
+     * @var Element
      */
     protected $a;
 
     /**
-     * @var BigInteger
+     * @var Element
      */
     protected $b;
 
@@ -32,8 +32,17 @@ class EllipticCurve
     public function __construct(Field $field, $a, $b)
     {
         $this->field = $field;
-        $this->a = $field->getBigInteger($a);
-        $this->b = $field->getBigInteger($b);
+
+        if (!($a instanceof Element)) {
+            $a = $this->field->getElement($a);
+        }
+
+        if (!($b instanceof Element)) {
+            $b = $this->field->getElement($b);
+        }
+
+        $this->a = $a;
+        $this->b = $b;
     }
 
     public function __get($name)
@@ -43,12 +52,12 @@ class EllipticCurve
 
     public function createPoint($a, $b, $infinity = 1): Point
     {
-        if (!($a instanceof BigInteger)) {
-            $a = $this->field->getBigInteger($a);
+        if (!($a instanceof Element)) {
+            $a = $this->field->getElement($a);
         }
 
-        if (!($b instanceof BigInteger)) {
-            $b = $this->field->getBigInteger($b);
+        if (!($b instanceof Element)) {
+            $b = $this->field->getElement($b);
         }
 
         return new Point($this, $a, $b, $infinity);
@@ -56,7 +65,7 @@ class EllipticCurve
 
     public function createInfinityPoint(): Point
     {
-        return new Point($this, $this->field->getBigInteger(0), $this->field->getBigInteger(1), 0);
+        return new Point($this, $this->field->getElement(0), $this->field->getElement(1), 0);
     }
 
     public function isPointOnCurve(Point $p)
@@ -78,30 +87,6 @@ class EllipticCurve
 
     public function generateRandomPoint()
     {
-        do {
-//            $x = $this->field->getRandomElement();
 
-            $x = new BigInteger(3, 11);
-            $y =
-                $x->power(3)
-                ->add(
-                    $this->a
-                        ->mul($x)
-                )
-                ->add($this->b)
-                ->sqrt()
-            ;
-
-            echo "$x : $y \n";
-            die();
-        } while(empty($y));
-
-        $p = $this->createPoint($x, $y);
-
-        if (!$this->isPointOnCurve($p)) {
-            $p = $this->generateRandomPoint();
-        }
-
-        return $p;
     }
 }

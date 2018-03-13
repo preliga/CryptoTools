@@ -8,7 +8,7 @@
 
 namespace EllipticCurveAlgorithms;
 
-use Components\BigInteger;
+use Components\Element;
 
 class Point
 {
@@ -18,22 +18,30 @@ class Point
     protected $ellipticCurve;
 
     /**
-     * @var BigInteger
+     * @var Element
      */
     protected $x;
 
     /**
-     * @var BigInteger
+     * @var Element
      */
     protected $y;
 
     /**
-     * @var
+     * @var Integer
      */
     protected $infinity;
 
-    public function __construct(EllipticCurve $ellipticCurve, BigInteger $x, BigInteger $y, $infinity)
+    public function __construct(EllipticCurve $ellipticCurve, $x, $y, $infinity)
     {
+        if (!($x instanceof Element)) {
+            $x = $this->ellipticCurve->field->getElement($x);
+        }
+
+        if (!($y instanceof Element)) {
+            $y = $this->ellipticCurve->field->getElement($y);
+        }
+
         $this->ellipticCurve = $ellipticCurve;
         $this->x = $x;
         $this->y = $y;
@@ -101,8 +109,8 @@ class Point
 
     public function mul($n): Point
     {
-        if (!($n instanceof BigInteger)) {
-            $n = new BigInteger($n);
+        if (!($n instanceof Element)) {
+            $n = $this->ellipticCurve->field->getElement($n);
         }
 
         if ($n->compare(0) == 0) {
@@ -117,7 +125,7 @@ class Point
 
             $Q = $this->ellipticCurve->createInfinityPoint();
             while ($n->compare(1) == 1) {
-                if ($n->modulo(2) == '1') {
+                if ($n->mod(2)->compare(1) == 0) {
                     $Q = $Q->add($P);
                 }
 

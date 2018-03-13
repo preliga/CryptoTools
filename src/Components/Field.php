@@ -9,28 +9,37 @@
 namespace Components;
 
 
-class Field
+abstract class Field
 {
-    protected $p;
+    abstract public function getElement($value);
 
-    public function __construct($p)
-    {
-        $this->p = $p;
-    }
+    abstract public function getRandomElement();
 
-    public function getBigInteger($value): BigInteger
-    {
-        return new BigInteger($value, $this->p);
-    }
+    abstract public function mul($a, $b);
 
-    public function __get($name)
-    {
-        return $this->$name;
-    }
+    abstract public function div($a, $b);
 
-    public function getRandomElement(): BigInteger
-    {
-        // gdy p - pierwsze
-        return new BigInteger(random_int(1, $this->p - 1), $this->p);
-    }
+    abstract public function mod($a, $n);
+
+    abstract public function inverse($a);
+
+    abstract public function add($a, $b);
+
+    abstract public function sub($a, $b);
+
+    abstract public function power($a, $n);
+
+    abstract public function opposite($a);
+
+    abstract public function compare($a, $b);
+
+    abstract public function bitLength($a);
+
+    abstract public function shiftRight($a, $n);
+
+    abstract public function shiftLeft($a, $n);
+
+    abstract public function setBit($a, $n);
+
+    abstract public function sqrt($a);
 }
