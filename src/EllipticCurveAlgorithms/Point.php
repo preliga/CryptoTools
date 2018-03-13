@@ -99,6 +99,10 @@ class Point
         }
     }
 
+    public function sub(Point $a) {
+        return $this->add($a->opposite());
+    }
+
     public function opposite()
     {
         $P = clone($this);

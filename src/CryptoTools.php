@@ -12,43 +12,38 @@ spl_autoload_register(function ($class_name) {
     require "$class_name.php";
 });
 
-//use Components\BigInteger;
 use Components\Field\FpField;
 use EllipticCurveAlgorithms\EllipticCurve;
 
+// ElGamal
 $f = new FpField(11);
-//
-//$a = $f->getElement(4);
-//
-//$b = $f->getElement(6);
-
 $e = new EllipticCurve($f, 10, 1);
-//
-$p = $e->generateRandomPoint();
-die($p);
-//
-//$P = $e->createPoint('0', '10');
-//$Q = $e->createPoint('3', '5');
-////
-//$R = $P->add($Q);
-//echo $R;
-////
-//echo "\n";
-//
-////$R = $P->add($P);
-//////$R = $P->add($P);
-//////$R = $P->add($P);
-////echo $R;
-////
-////echo "\n";
 
-//$H = $e->createPoint('10', '1', 1);
-//$S = $H->mul(5);
-//echo $S;
-//
-//echo "\n";
+$P = $e->createPoint(5, 6); // wiadomość
 
-//$S = $H->add($H);
-//echo $S;
+echo "P: $P \n";
+
+$B = $e->generateRandomPoint(); // jawny nadawca
+echo "B: $B \n";
+
+$k = $f->getElement(7); // tajny odbiorca
+echo "k: $k \n";
+
+$kB = $B->mul($k); // jawny odbiorca
+echo "kB: $kB \n";
+
+$r = $f->getRandomElement(); // tajny nadawca
+echo "r: $r \n";
+
+$rB = $B->mul($r);
+echo "rB: $rB \n";
+
+$P_rkb = $P->add($kB->mul($r));
+echo "P+r(kB): $P_rkb \n";
+
+echo "cipherPoint: [$rB, $P_rkb] \n";
+
+$plainPoint = $P_rkb->sub($rB->mul($k));
+echo "plainPoint: $plainPoint \n";
 
 exit();
