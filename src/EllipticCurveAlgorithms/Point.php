@@ -40,6 +40,11 @@ class Point
         $this->infinity = $infinity;
     }
 
+    public function __get($name)
+    {
+        return $this->$name;
+    }
+
     public function add(Point $Q): Point
     {
         if ($this->infinity == 0) {

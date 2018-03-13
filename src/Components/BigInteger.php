@@ -14,10 +14,19 @@ class BigInteger
 
     protected $mod = null;
 
-    public function __construct($value, $mod = null)
+    protected $field = null;
+
+    public function __construct($value, $filed = null)
     {
         $this->value = $value;
-        $this->mod = $mod;
+
+        if ($filed instanceof Field) {
+            $this->field = $filed;
+        } else {
+            $this->field = new Field($filed);
+        }
+
+        $this->mod = $this->field->p;
 
         if (!empty($mod)) {
             $this->value = $this->modulo($this->mod);//
@@ -133,6 +142,74 @@ class BigInteger
         }
 
         return bccomp($this->value, $b);
+    }
+
+    public function bitLength()
+    {
+        return strlen(base_convert($this->value, 10, 2));
+    }
+
+    public function shiftRight($n)
+    {
+        $temp = substr(base_convert($this->value, 10, 2), 0, -$n);
+
+        if ($temp == '') {
+            $temp = '0';
+        }
+
+        return new BigInteger(substr(base_convert($temp, 2, 10), $this->mod));
+    }
+
+    public function shiftLeft($n)
+    {
+        $temp = base_convert($this->value, 10, 2);
+        for ($i = 0; $i < $n; $i++) {
+            $temp .= "0";
+        }
+
+        return new BigInteger(base_convert($temp, 2, 10), $this->mod);
+    }
+
+    public function setBit($n)
+    {
+        $temp = base_convert($this->value, 10, 2);
+
+        while (strlen($temp) <= $n) {
+            $temp = "0" . $temp;
+        }
+        $n = strlen($temp) - $n;
+
+        $temp = substr_replace($temp, '1', $n - 1, 1);
+        return new BigInteger(base_convert($temp, 2, 10), $this->mod);
+    }
+
+    public function sqrt2()
+    {
+        do {
+            $g = $this->field->getRandomElement();
+        } while (empty($g->sqrt()));
+
+    }
+
+    public function sqrt()
+    {
+        $div = (new BigInteger(0, $this->mod))->setBit($this->bitLength() / 2);
+        $div2 = $div;
+
+        while (true) {
+            $y =
+                $div->add(
+                    $this->div($div)
+                )
+                    ->shiftRight(1);
+
+            if ($y->compare($div) == 0 || $y->compare($div2)) {
+                return $y->power(2)->compare($this) == 0 ? $y : false;
+            }
+
+            $div2 = $div;
+            $div = $y;
+        }
     }
 
     public function __toString(): string

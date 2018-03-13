@@ -17,8 +17,10 @@ use Components\Field;
 use EllipticCurveAlgorithms\EllipticCurve;
 
 $f = new Field(11);
-
 $e = new EllipticCurve($f, 10, 1);
+
+$p = $e->generateRandomPoint();
+die($p);
 
 $P = $e->createPoint('0', '10');
 $Q = $e->createPoint('3', '5');
