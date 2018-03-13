@@ -87,6 +87,13 @@ class EllipticCurve
 
     public function generateRandomPoint()
     {
+        do {
+            $x = $this->field->getRandomElement();
+            $y = $this->field->getRandomElement();
 
+            $p = $this->createPoint($x, $y);
+        } while (!$this->isPointOnCurve($p));
+
+        return $p;
     }
 }

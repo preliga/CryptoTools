@@ -24,16 +24,16 @@ $f = new FpField(11);
 
 $e = new EllipticCurve($f, 10, 1);
 //
-//$p = $e->generateRandomPoint();
-//die($p);
+$p = $e->generateRandomPoint();
+die($p);
 //
-$P = $e->createPoint('0', '10');
-$Q = $e->createPoint('3', '5');
-//
-$R = $P->add($Q);
-echo $R;
-//
-echo "\n";
+//$P = $e->createPoint('0', '10');
+//$Q = $e->createPoint('3', '5');
+////
+//$R = $P->add($Q);
+//echo $R;
+////
+//echo "\n";
 //
 ////$R = $P->add($P);
 //////$R = $P->add($P);
@@ -42,9 +42,9 @@ echo "\n";
 ////
 ////echo "\n";
 
-$H = $e->createPoint('10', '1', 1);
-$S = $H->mul(5);
-echo $S;
+//$H = $e->createPoint('10', '1', 1);
+//$S = $H->mul(5);
+//echo $S;
 //
 //echo "\n";
 

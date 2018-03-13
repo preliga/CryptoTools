@@ -33,7 +33,7 @@ class FpField extends Field
     public function getRandomElement(): RealElement
     {
         // gdy p - pierwsze
-        return new RealElement(random_int(1, $this->p - 1), $this->p);
+        return new RealElement($this, random_int(1, $this->p - 1), $this->p);
     }
 
     public function mul($a, $b): RealElement
