@@ -15,15 +15,28 @@ spl_autoload_register(function ($class_name) {
 use Components\Field\FpField;
 use EllipticCurveAlgorithms\EllipticCurve;
 
+/////////////////////////////
+//$f = new FpField(11);
+//$e = new EllipticCurve($f, 10, 1);
+//
+//$B = $e->createPoint(10,10);
+//for($i = 0; $i < 11; $i++) {
+//    $kB = $B->mul($i);
+//    echo "[$i]$B = $kB \n";
+//}
+//
+//exit();
+/////////////////////////////
+
 // ElGamal
 $f = new FpField(11);
 $e = new EllipticCurve($f, 10, 1);
 
-$P = $e->createPoint(5, 6); // wiadomość
+$P = $e->createPoint(3, 5); // wiadomość
 
 echo "P: $P \n";
 
-$B = $e->generateRandomPoint(); // jawny nadawca
+$B = $e->createPoint(10,10);//$e->generateRandomPoint(); // jawny nadawca
 echo "B: $B \n";
 
 $k = $f->getElement(7); // tajny odbiorca

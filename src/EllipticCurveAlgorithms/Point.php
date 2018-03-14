@@ -134,7 +134,7 @@ class Point
                 }
 
                 $P = $P->add($P);
-                $n = $n->div(2);
+                $n = $n->shiftRight(1);
             }
 
             $Q = $Q->add($P);

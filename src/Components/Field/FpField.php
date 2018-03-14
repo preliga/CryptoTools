@@ -186,7 +186,7 @@ class FpField extends Field
             $temp = '0';
         }
 
-        return $this->getElement(substr(base_convert($temp, 2, 10)));
+        return $this->getElement(base_convert($temp, 2, 10));
     }
 
     public function shiftLeft($a, $n)
