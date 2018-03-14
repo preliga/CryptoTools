@@ -15,19 +15,6 @@ spl_autoload_register(function ($class_name) {
 use Components\Field\FpField;
 use EllipticCurveAlgorithms\EllipticCurve;
 
-/////////////////////////////
-//$f = new FpField(11);
-//$e = new EllipticCurve($f, 10, 1);
-//
-//$B = $e->createPoint(10,10);
-//for($i = 0; $i < 11; $i++) {
-//    $kB = $B->mul($i);
-//    echo "[$i]$B = $kB \n";
-//}
-//
-//exit();
-/////////////////////////////
-
 // ElGamal
 //$f = new FpField(11);
 //$e = new EllipticCurve($f, 10, 1);
@@ -59,56 +46,98 @@ use EllipticCurveAlgorithms\EllipticCurve;
 //$plainPoint = $P_rkb->sub($rB->mul($k));
 //echo "plainPoint: $plainPoint \n";
 /////////////////////////////
+const BLOCK_SIZE = 40;
 
 // HASH ElGamal
-$f = new FpField(11);
-$e = new EllipticCurve($f, 10, 1);
+echo "--------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+echo "......................................................................Hash ElGamal......................................................................\n";
+echo "--------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+$message = 'Message';
+//$message = 'Values outside the valid range (0..255) will be bitwise and\'ed with 255, which is equivalent to the following algorithm:';
+echo "Nadawca chcę wysłać wiadomość: '$message' \n";
 
-$M = 'Message';
-//$P = $e->createPoint(3, 5); // wiadomość
-echo "M: $M \n";
+$amountBlocks = ceil(strlen($message) / (BLOCK_SIZE / 2));
 
-$M = ascii2hex($M);
-echo "M: $M \n";
+echo "Liczba bloków wiadomości: $amountBlocks \n";
+echo "--------------------------------------------------------------------------------------------------------------------------------------------------------\n";
 
-$B = $e->createPoint(10,10);//$e->generateRandomPoint(); // jawny nadawca
-echo "B: $B \n";
+for ($i = 0; $i < $amountBlocks; $i++) {
+    $msg = substr($message, $i * BLOCK_SIZE / 2, BLOCK_SIZE / 2);
 
-$k = $f->getElement(7); // tajny odbiorca
-echo "k: $k \n";
+    echo "\n########################################################################################################################################################\n";
+    echo "Blok nr (" . ($i + 1) .") M = '$msg' \n";
+    echo "--------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+    ElGamal($msg);
+}
 
-$kB = $B->mul($k); // jawny odbiorca
-echo "kB: $kB \n";
-
-$r = $f->getRandomElement(); // tajny nadawca
-echo "r: $r \n";
-
-$rB = $B->mul($r);
-echo "rB: $rB \n";
-
-$hash = getHASH($M, $kB->mul($r));
-echo "M xor SHA1(r(kB)): $hash \n";
-
-echo "cipherPoint: [$rB, $hash] \n";
-
-$plainPoint = getHASH($hash, $rB->mul($k));
-echo "plainPoint: $plainPoint \n";
+echo "KONIEC";
 /////////////////////////////
 exit();
 
-function getHASH($M, \EllipticCurveAlgorithms\Point $P) : string
+function ElGamal($message)
 {
-    $str = $M;
+    $f = new FpField(71);
+    #E = 'y^2 = x^3 + ax + b';
+    $e = new EllipticCurve($f, 10, 1);
 
-    while(strlen($str) < 40) {
-        $str = "0$str";
+    $M = ascii2hex($message);
+    echo "Nadawca koduje wiadomość M w postaci Hex: '$M' \n";
+
+    $B = $e->generateRandomPoint(); // jawny nadawca
+    echo "Nadawca losuje punkt B na krzywej eliptycznej: $B Nastepniie go ujawnia. \n";
+
+    echo "--------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+
+    $k = $f->getElement(7); // tajny odbiorca
+    echo "Odbiorca losuje tajną liczbę k = $k \n";
+
+    $kB = $B->mul($k); // jawny odbiorca
+    echo "Odbiorca wyliczba [k]B = [$k]($B) = $kB Następnie ujawnia ten punkt. \n";
+
+    echo "--------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+
+    $r = $f->getRandomElement(); // tajny nadawca
+    echo "Nadawca losuje tajną liczbę r = $r \n";
+
+    $rB = $B->mul($r);
+    echo "Nadawca wyliczba [r]B = [$r]$B = $rB \n";
+
+    $hash = xorWithHASH($M, $kB->mul($r));
+
+    echo "--------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+
+    echo "Nadawca szyfruje wiadomość M w postaci (C1, C2) = ([r]B, M xor SHA1( [r]([k]B) ) ) = ($rB, $hash) \n";
+
+    $plainPoint = xorWithHASH($hash, $rB->mul($k));
+    echo "Odbiorca odszyfrowuje wiadomość C2 xor SHA1( [k]([r]B) ) = M = '" . hexToStr($plainPoint) . "' \n";
+
+    echo "--------------------------------------------------------------------------------------------------------------------------------------------------------\n\n";
+}
+
+function hexToStr($message): string
+{
+    $str = "";
+    for ($i = 0; $i < strlen($message); $i += 2) {
+        $hex = $message[$i] . $message[$i + 1];
+        if ($hex != '00') {
+            $dec = hexdec($hex);
+            $str .= chr($dec);
+        }
     }
 
+    return $str;
+}
+
+function xorWithHASH($message, \EllipticCurveAlgorithms\Point $P): string
+{
+    $str = $message;
+    while (strlen($str) < BLOCK_SIZE) {
+        $str = "0$str";
+    }
     $hash = sha1($P->__toString());
 
-    echo "HASH: $hash \n\n";
     $xor = "";
-    for ($index = 0; $index < 40; $index++){
+    for ($index = 0; $index < BLOCK_SIZE; $index++) {
         $dec = hexdec($str[$index]) ^ hexdec($hash[$index]);
         $xor[$index] = dechex($dec);
     }
@@ -116,15 +145,13 @@ function getHASH($M, \EllipticCurveAlgorithms\Point $P) : string
     return $xor;
 }
 
-function ascii2hex($ascii) : string
+function ascii2hex($ascii): string
 {
     $hex = '';
     for ($i = 0; $i < strlen($ascii); $i++) {
         $byte = strtoupper(dechex(ord($ascii{$i})));
-        $byte = str_repeat('0', 2 - strlen($byte)).$byte;
-        $hex.=$byte."";
+        $byte = str_repeat('0', 2 - strlen($byte)) . $byte;
+        $hex .= $byte . "";
     }
     return strtolower($hex);
 }
-
-#https://crypto.stackexchange.com/questions/14955/mapping-of-message-onto-elliptic-curve-and-reverse-it
