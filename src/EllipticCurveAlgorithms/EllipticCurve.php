@@ -85,8 +85,10 @@ class EllipticCurve
         return $a->compare($b) == 0;
     }
 
-    public function generateRandomPoint()
+    public function generateRandomPoint(Point $G)
     {
+//        $k = $this->field->getRandomElement();
+//        return $G->mul($k);
         do {
             $x = $this->field->getRandomElement();
             $y = $this->field->getRandomElement();

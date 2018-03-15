@@ -142,6 +142,11 @@ class Point
         }
     }
 
+    public function isInfinity()
+    {
+        return $this->infinity == 0;
+    }
+
     public function __toString(): String
     {
         return "( {$this->x} : {$this->y} : {$this->infinity})";
