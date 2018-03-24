@@ -33,9 +33,10 @@ class Sender extends Worker
 
         $message = file_get_contents($this->messageFile);
         show("Nadawca chce wyslac wiadomosc: '$message' \n");
-        $amountBlocks = ceil(strlen($message) / (BLOCK_SIZE / 2));
+        $sizeMessage = strlen($message);
+        $amountBlocks = ceil($sizeMessage / (BLOCK_SIZE / 2));
         show("Liczba blokow wiadomosci: $amountBlocks \n");
-
+        show("Ilość bajtów wiadomosci: $sizeMessage \n");
         $this->send(PATH_FILE_AMOUNT_BLOCK, json_encode(['amountBlock' => "$amountBlocks"]));
 
         show("------------------------------------------------\n");

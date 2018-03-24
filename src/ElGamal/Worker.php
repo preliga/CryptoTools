@@ -47,10 +47,8 @@ abstract class Worker
         $str = "";
         for ($i = 0; $i < strlen($message); $i += 2) {
             $hex = $message[$i] . $message[$i + 1];
-            if ($hex != '00') {
-                $dec = hexdec($hex);
-                $str .= chr($dec);
-            }
+            $dec = hexdec($hex);
+            $str .= chr($dec);
         }
 
         return $str;
@@ -58,16 +56,11 @@ abstract class Worker
 
     public function xorWithHASH($message, Point $P): string
     {
-        $str = $message;
-        while (strlen($str) < BLOCK_SIZE) {
-            $str = "0$str";
-        }
-
         $hash = hash(HASH, $P->__toString());
 
         $xor = "";
-        for ($index = 0; $index < BLOCK_SIZE; $index++) {
-            $dec = hexdec($str[$index]) ^ hexdec($hash[$index]);
+        for ($index = 0; $index < strlen($message); $index++) {
+            $dec = hexdec($message[$index]) ^ hexdec($hash[$index]);
             $xor .= dechex($dec);
         }
         return $xor;
@@ -93,7 +86,10 @@ abstract class Worker
     {
         while (!file_exists($file)) ;
         $value = json_decode(file_get_contents($file), true);
-        unlink($file);
+
+        if (file_exists($file)) {
+            unlink($file);
+        }
 
         return $value;
     }
