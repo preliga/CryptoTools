@@ -8,8 +8,8 @@
 
 namespace Components\Field;
 
-use Components\Field;
 use Components\Element\RealElement;
+use Components\Field;
 
 class FpField extends Field
 {
@@ -32,8 +32,16 @@ class FpField extends Field
 
     public function getRandomElement(): RealElement
     {
+
+        $len = random_int(1, strlen($this->p));
+        $value = "";
+
+        for ($i = 0; $i < $len; $i++) {
+            $value .= random_int(0, 9);
+        }
+
         // gdy p - pierwsze
-        return new RealElement($this, random_int(1, $this->p - 1), $this->p);
+        return new RealElement($this, $value);
     }
 
     public function mul($a, $b): RealElement

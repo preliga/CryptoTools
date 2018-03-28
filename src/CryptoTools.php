@@ -16,6 +16,7 @@ define('PATH_FILE_AMOUNT_BLOCK', '../tube/amountBlock');
 define('PATH_FILE_B', '../tube/B');
 define('PATH_FILE_kB', '../tube/kB');
 define('PATH_FILE_CIPHER_TEXT', '../tube/cipherText');
+define('PATH_FLAG_END', '../tube/flagEnd');
 
 //define('PATH_FILE_RESULTS', '../result/result');
 

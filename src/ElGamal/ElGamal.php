@@ -41,7 +41,7 @@ class ElGamal
         $this->e = new EllipticCurve($this->field, $params['a'], $params['b']);
 
         $this->G = $this->e->createPoint($params['G']['x'], $params['G']['y']);
-        $this->rzG = $params['#G'];
+        $this->rzG = $params['#G'] ?? 0;
     }
 
     public function run(string $mode, string $messageFile, string $outputFile)

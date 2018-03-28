@@ -71,11 +71,16 @@ class Receiver extends Worker
         show("Odbiorca odszyfrowuje wiadomosc: \nC2 xor $hashFunction( [k]([r]B) ) = M = '" . $msg . "' \n");
 
         $this->saveMessage($msg);
+
+        $this->send(PATH_FLAG_END, 'koniec');
     }
 
     public function saveMessage($msg)
     {
-        $file = fopen($this->outputFile, 'a');
+        do {
+            @$file = fopen($this->outputFile, 'a');
+        } while ($file == false);
+
         fwrite($file, $msg);
         fclose($file);
     }

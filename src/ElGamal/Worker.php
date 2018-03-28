@@ -88,7 +88,7 @@ abstract class Worker
         $value = json_decode(file_get_contents($file), true);
 
         if (file_exists($file)) {
-            unlink($file);
+            @unlink($file);
         }
 
         return $value;

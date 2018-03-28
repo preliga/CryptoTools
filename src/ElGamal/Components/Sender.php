@@ -36,7 +36,7 @@ class Sender extends Worker
         $sizeMessage = strlen($message);
         $amountBlocks = ceil($sizeMessage / (BLOCK_SIZE / 2));
         show("Liczba blokow wiadomosci: $amountBlocks \n");
-        show("Ilość bajtów wiadomosci: $sizeMessage \n");
+        show("Ilosc bajtow wiadomosci: $sizeMessage \n");
         $this->send(PATH_FILE_AMOUNT_BLOCK, json_encode(['amountBlock' => "$amountBlocks"]));
 
         show("------------------------------------------------\n");
@@ -57,7 +57,9 @@ class Sender extends Worker
         $M = $this->ascii2hex($message);
         show("Nadawca koduje wiadomosc M w postaci Hex: '$M' \n");
 
-        $B = $this->e->generateRandomPoint($this->G); // jawny nadawca
+        do {
+            $B = $this->e->generateRandomPoint($this->G); // jawny nadawca
+        } while ($B->isInfinity());
         show("Nadawca losuje punkt B na krzywej eliptycznej: $B \nNastepniie go ujawnia. \n");
 
         $this->send(PATH_FILE_B, json_encode(['x' => "$B->x", 'y' => "$B->y"]));
@@ -81,7 +83,7 @@ class Sender extends Worker
 
         $this->send(PATH_FILE_CIPHER_TEXT, json_encode(['rB' => ['x' => "$rB->x", 'y' => "$rB->y"], 'hash' => $hash]));
 
-        while (file_exists(PATH_FILE_CIPHER_TEXT)) ;
+        $this->receive(PATH_FLAG_END);
     }
 
     public function removeFiles()
@@ -100,6 +102,10 @@ class Sender extends Worker
 
         if (file_exists(PATH_FILE_CIPHER_TEXT)) {
             unlink(PATH_FILE_CIPHER_TEXT);
+        }
+
+        if (file_exists(PATH_FLAG_END)) {
+            unlink(PATH_FLAG_END);
         }
     }
 }
