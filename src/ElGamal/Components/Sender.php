@@ -32,7 +32,7 @@ class Sender extends Worker
         $this->removeFiles();
 
         $message = file_get_contents($this->messageFile);
-        show("Nadawca chce wyslac wiadomosc: '$message' \n");
+        show("Nadawca chce wyslac wiadomosc: '$message' \n\n");
         $sizeMessage = strlen($message);
         $amountBlocks = ceil($sizeMessage / (BLOCK_SIZE / 2));
         show("Liczba blokow wiadomosci: $amountBlocks \n");
@@ -55,17 +55,18 @@ class Sender extends Worker
     public function sendMessage($message)
     {
         $M = $this->ascii2hex($message);
-        show("Nadawca koduje wiadomosc M w postaci Hex: '$M' \n");
+        show("Nadawca koduje wiadomosc M w postaci Hex: '$M' \n\n");
 
         do {
             $B = $this->e->generateRandomPoint($this->G); // jawny nadawca
         } while ($B->isInfinity());
-        show("Nadawca losuje punkt B na krzywej eliptycznej: $B \nNastepniie go ujawnia. \n");
+        show("Nadawca losuje punkt B na krzywej eliptycznej: $B Nastepnie wysyla go do odbiorcy. \n");
 
         $this->send(PATH_FILE_B, json_encode(['x' => "$B->x", 'y' => "$B->y"]));
 
         $X = $this->receive(PATH_FILE_kB);
         $kB = $this->e->createPoint($X['x'], $X['y']);
+        show("Nadawca odbiera punkt [k]B: $kB \n");
         show("------------------------------------------------\n");
 
         do {

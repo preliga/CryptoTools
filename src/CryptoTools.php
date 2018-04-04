@@ -54,7 +54,7 @@ show("------------------------------------------------\n");
 $ElGamal = new \ElGamal\ElGamal($params);
 $ElGamal->run($mode, $messageFile, $outputFile);
 
-show("KONIEC");
+//show("KONIEC");
 /////////////////////////////
 exit();
 
